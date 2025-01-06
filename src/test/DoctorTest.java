@@ -1,12 +1,12 @@
 package space;
 
+import static org.junit.Assert.*;
+
 import org.junit.Before;
 import org.junit.Test;
 
 import java.time.LocalTime;
 import java.util.Arrays;
-
-import static org.junit.Assert.*;
 
 public class DoctorTest {
 
@@ -14,9 +14,10 @@ public class DoctorTest {
 
     @Before
     public void setUp() {
-        doctor = new Doctor("John", "Doe", "Cardiologist",
-                Arrays.asList(LocalTime.of(9, 0), LocalTime.of(10, 0)), 180);
-    }
+        doctor = new Doctor("John", "Cardiology",
+        Arrays.asList(LocalTime.of(9, 0), LocalTime.of(10, 0)), 180);
+    };
+    
 
     @Test
     public void testIsAvailable() {
@@ -35,3 +36,4 @@ public class DoctorTest {
         doctor.setAvailableMinutes(-10);
     }
 }
+

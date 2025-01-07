@@ -4,6 +4,8 @@ import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.Date;
 import java.sql.Time;
+import java.util.ArrayList;
+import java.util.List;
 
 public class sqlConnect {
     private final  String path = "jdbc:mysql://sql7.freesqldatabase.com:3306/sql7755696";
@@ -84,6 +86,46 @@ public class sqlConnect {
     public String getPassword() {
         return password;
     }
+
+     public List<Doctor> createDocList() {
+        List<Doctor> doctors = new ArrayList<>(); 
+        try (
+        Statement statement = myCon.createStatement(); 
+        ResultSet resultSet = statement.executeQuery("SELECT * FROM doctor")
+        ) { 
+            while (resultSet.next()) { 
+                 { String docCode = resultSet.getString("docCode"); 
+                 String name = resultSet.getString("nameD"); 
+                 String surname = resultSet.getString("surname"); 
+                 String specialization = resultSet.getString("specialization"); 
+                 Time availableTime = resultSet.getTime("availableTime"); 
+                 Doctor doctor = new Doctor(docCode, name, surname, specialization, availableTime); 
+                 doctors.add(doctor); 
+            } 
+        }
+    } catch (SQLException e) { 
+        } 
+            return doctors; 
+    }
+
+    public List<Appointment> createApptList() {
+        List<Appointment> appointments = new ArrayList<>();
+        try (
+        Statement statement = myCon.createStatement(); 
+        ResultSet resultSet = statement.executeQuery("SELECT * FROM Appointment")) {  
+        while (resultSet.next()) { 
+            String doctCode = resultSet.getString("doctCode"); 
+            String specialization = resultSet.getString("specialization"); 
+            Time apptTime = resultSet.getTime("apptTime"); 
+            Date apptDate = resultSet.getDate("apptDate"); 
+            String patientName = resultSet.getString("patientName"); 
+            Appointment appointment = new Appointment(doctCode, specialization, apptTime, apptDate, patientName);
+                appointments.add(appointment);
+            } 
+        } catch (SQLException e) { 
+        } 
+            return appointments; 
+        }
 }
 
         

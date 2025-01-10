@@ -1,5 +1,3 @@
-package space;
-
 import java.time.LocalTime;
 import java.util.List;
 
@@ -11,11 +9,12 @@ public class Doctor {
     private int availableMinutes; // Συνολικός διαθέσιμος χρόνος σε λεπτά
     private String docCode;
 
-    public Doctor(String name, String surname, String specialization, List<LocalTime> availableTimeSlots,
+    public Doctor(String docCode, String name, String surname, String specialization, List<LocalTime> availableTimeSlots,
             int availableMinutes) {
         if (name == null || surname == null || specialization == null || availableTimeSlots == null) {
             throw new IllegalArgumentException("Doctor fields cannot be null");
         }
+        this.docCode = docCode;
         this.name = name;
         this.surname = surname;
         this.specialization = specialization;

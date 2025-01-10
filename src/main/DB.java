@@ -22,7 +22,6 @@ public class DB {
 	 */
 	public Connection getConnection() throws Exception {
         try {
-            // Load MySQL driver (modern drivers auto-register)
             Class.forName("com.mysql.cj.jdbc.Driver");
         } catch (ClassNotFoundException e) {
             throw new Exception("MySQL Driver not found: " + e.getMessage());

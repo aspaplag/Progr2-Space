@@ -1,9 +1,12 @@
-import java.sql.Connection; 
-import java.sql.DriverManager; 
-import java.sql.PreparedStatement; 
-import java.sql.SQLException;
+import java.sql.Connection;
 import java.sql.Date;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
 import java.sql.Time;
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -17,9 +20,9 @@ public class sqlConnect {
         try {
             Class.forName("com.mysql.cj.jdbc.Driver");
             this.myCon = DriverManager.getConnection(this.path, this.username, this.password);
-            
+
         } catch (ClassNotFoundException ex) {
-        
+
         }
         return this.myCon;
     }
@@ -29,7 +32,7 @@ public class sqlConnect {
         try {
             String sql = "INSERT INTO Patient(AMKA, Name, Surname, dateOfBirth, phoneNumber, address, email, medicalRecord, gender) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?)";
             PreparedStatement insertStmt = myCon.prepareStatement(sql);
-            
+
             insertStmt.setString(1, value1);
             insertStmt.setString(2, value2);
             insertStmt.setString(3, value3);
@@ -42,7 +45,7 @@ public class sqlConnect {
             insertStmt.executeUpdate();
         } catch (SQLException ex) {
         }
-       
+
     }
 
     public void insertAppointment(String val1, String val2, Date val3, Time val4, String val5) {
@@ -87,45 +90,115 @@ public class sqlConnect {
         return password;
     }
 
-     public List<Doctor> createDocList() {
-        List<Doctor> doctors = new ArrayList<>(); 
-        try (
-        Statement statement = myCon.createStatement(); 
-        ResultSet resultSet = statement.executeQuery("SELECT * FROM doctor")
-        ) { 
-            while (resultSet.next()) { 
-                 { String docCode = resultSet.getString("docCode"); 
-                 String name = resultSet.getString("nameD"); 
-                 String surname = resultSet.getString("surname"); 
-                 String specialization = resultSet.getString("specialization"); 
-                 Time availableTime = resultSet.getTime("availableTime"); 
-                 Doctor doctor = new Doctor(docCode, name, surname, specialization, availableTime); 
-                 doctors.add(doctor); 
-            } 
+    public List<Doctor> createDocList() {
+        List<Doctor> doctors = new ArrayList<>();
+        try (Statement statement = myCon.createStatement();
+             ResultSet resultSet = statement.executeQuery("SELECT * FROM doctor")) {
+
+            while (resultSet.next()) {
+                String docCode = resultSet.getString("docCode");
+                String name = resultSet.getString("name");
+                String surname = resultSet.getString("surname");
+                String specialization = resultSet.getString("specialization");
+                List<LocalTime> availableTimeSlots = (List<LocalTime>) resultSet.getTime("availableTimeSlots");
+                int availableMinutes = resultSet.getInt("availableMinutes");
+                Doctor doctor = new Doctor(docCode, name, surname, specialization, availableTimeSlots, availableMinutes);
+                doctors.add(doctor);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
         }
-    } catch (SQLException e) { 
-        } 
-            return doctors; 
+        return doctors;
     }
 
     public List<Appointment> createApptList() {
         List<Appointment> appointments = new ArrayList<>();
-        try (
-        Statement statement = myCon.createStatement(); 
-        ResultSet resultSet = statement.executeQuery("SELECT * FROM Appointment")) {  
-        while (resultSet.next()) { 
-            String doctCode = resultSet.getString("doctCode"); 
-            String specialization = resultSet.getString("specialization"); 
-            Time apptTime = resultSet.getTime("apptTime"); 
-            Date apptDate = resultSet.getDate("apptDate"); 
-            String patientName = resultSet.getString("patientName"); 
-            Appointment appointment = new Appointment(doctCode, specialization, apptTime, apptDate, patientName);
-                appointments.add(appointment);
-            } 
-        } catch (SQLException e) { 
-        } 
-            return appointments; 
-        }
-}
+        try (Statement statement = myCon.createStatement();
+             ResultSet resultSet = statement.executeQuery("SELECT * FROM Appointment")) {
+    
+            while (resultSet.next()) {
+                String docCode = resultSet.getString("docCode");
+                String specialization = resultSet.getString("specialization");
+                Time apptTime = resultSet.getTime("apptTime");
+                Date apptDate = resultSet.getDate("apptDate");
+                
+                Patient patient = createPatientFromResultSet(resultSet);
 
+                int priority = resultSet.getInt("priority");
+                int duration = resultSet.getInt("duration");
+    
+                // Fetch doctor details (ensure the ResultSet has necessary columns)
+                Doctor doctor = createDoctorFromResultSet(resultSet);
+    
+                // Create Appointment object
+                Appointment appointment = new Appointment(docCode, specialization, apptTime, apptDate, patient, doctor, priority, duration);
+                appointments.add(appointment);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return appointments;
+    }
+
+    public Doctor createDoctorFromResultSet(ResultSet resultSet) throws SQLException {
+        // Retrieve data from ResultSet
+        String docCode = resultSet.getString("docCode");
+        String name = resultSet.getString("name");
+        String surname = resultSet.getString("surname");
+        String specialization = resultSet.getString("specialization");
+        List<LocalTime> availableTimeSlots = new ArrayList<>();
+        String[] timeStrings = resultSet.getString("availableTime").split(",");
+        for (String timeString : timeStrings) {
+            availableTimeSlots.add(LocalTime.parse(timeString.trim()));
+        }
+    
+        int availableMinutes = resultSet.getInt("availableMinutes");
+    
+        // Create and return the Doctor object
+        return new Doctor(docCode, name, surname, specialization, availableTimeSlots, availableMinutes);
+    }
+
+    public Patient createPatientFromResultSet(ResultSet resultSet) throws SQLException {
         
+        int amka = resultSet.getInt("AMKA");
+        String name = resultSet.getString("Name");
+        String surname = resultSet.getString("Surname");
+        String dateOfBirth = resultSet.getString("dateOfBirth");
+        String phoneNumber = resultSet.getString("phoneNumber");
+        String address = resultSet.getString("adress");
+        String email = resultSet.getString("email");
+        String medicalRecord = resultSet.getString("medicalRecord");
+        String gender = resultSet.getString("gender");
+        
+        Patient patient = new Patient(name, surname, dateOfBirth, address, phoneNumber, email, amka, gender);
+        
+        return patient;
+    }
+
+    public List<Doctor> getDoctorsBySpecialization(String selectedSpecialty) {
+        List<Doctor> doctors = new ArrayList<>();
+        String query = "SELECT * FROM doctor WHERE specialization = ?";
+        try (PreparedStatement preparedStatement = myCon.prepareStatement(query)) {
+            preparedStatement.setString(1, selectedSpecialty);
+            try (ResultSet resultSet = preparedStatement.executeQuery()) {
+                while (resultSet.next()) {
+                    String docCode = resultSet.getString("docCode");
+                    String name = resultSet.getString("name");
+                    String surname = resultSet.getString("surname");
+                    String specialization = resultSet.getString("specialization");
+                    List<LocalTime> availableTimeSlots = (List<LocalTime>) resultSet.getTime("availableTimeSlots");
+                    int availableMinutes = resultSet.getInt("availableMinutes");
+                    Doctor doctor = new Doctor(docCode, name, surname, specialization, availableTimeSlots, availableMinutes);
+                    doctors.add(doctor);
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return doctors;
+    }
+
+    public List<Appointment> getAppointments() {
+        return createApptList(); // Reuse `createApptList`
+    }
+}

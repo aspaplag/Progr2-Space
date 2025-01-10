@@ -11,31 +11,39 @@ import java.util.List;
 
 public class SqlConnect {
 
-    public void insertPatient(String value1, String value2, String value3, Date value4, String value5, String value6,
-     String value7, String value8, String value9) throws Exception {
-
+   public void insertPatient(int amka, String name, String surname, Date dateOfBirth, String phoneNumber,
+            String address,
+            String email, String medicalRecord, String gender) throws Exception {
         DB db = new DB();
-        String sql = "INSERT INTO Patient(AMKA, Name, Surname, dateOfBirth, phoneNumber, address, email, medicalRecord, gender) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO Patient (AMKA, Name, Surname, dateOfBirth, phoneNumber, address, email, medicalRecord, gender) "
+                +
+                "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
-        try(Connection con = db.getConnection();
-            PreparedStatement pstmt = con.prepareStatement(sql)) {
+        try (Connection con = db.getConnection();
+                PreparedStatement pstmt = con.prepareStatement(sql)) {
 
-            pstmt.setString(1, value1);
-            pstmt.setString(2, value2);
-            pstmt.setString(3, value3);
-            pstmt.setDate(4, value4);
-            pstmt.setString(5, value5);
-            pstmt.setString(6, value6);
-            pstmt.setString(7, value7);
-            pstmt.setString(8, value8);
-            pstmt.setString(9, value9);
-            pstmt.executeUpdate();
+            pstmt.setInt(1, amka);
+            pstmt.setString(2, name);
+            pstmt.setString(3, surname);
+            pstmt.setDate(4, dateOfBirth);
+            pstmt.setString(5, phoneNumber);
+            pstmt.setString(6, address);
+            pstmt.setString(7, email);
+            pstmt.setString(8, medicalRecord);
+            pstmt.setString(9, gender);
+
+            int rowsAffected = pstmt.executeUpdate();
+            if (rowsAffected > 0) {
+                System.out.println("Patient successfully inserted into the database.");
+            } else {
+                System.out.println("No rows were inserted. Please check your data.");
+            }
 
         } catch (SQLException ex) {
+            System.err.println("An error occurred while inserting the patient: " + ex.getMessage());
+            throw new Exception("Database error: " + ex.getMessage(), ex);
         }
-
     }
-
     public void insertAppointment(String val1, String val2, Date val3, Time val4, String val5) throws Exception {
 
         DB db = new DB();
@@ -66,19 +74,35 @@ public class SqlConnect {
         }
     }
 
-    public void selectAMKA(String amkaString) throws Exception {
-
-        DB db = new DB();
-        String sql = "SELECT * FROM Patient WHERE AMKA = " + amkaString;
+    public Patient selectAMKA(String amkaString) throws Exception {
+        Patient patient = null; // Αρχικοποίηση του αντικειμένου Patient
+        DB db = new DB(); // Σύνδεση με τη βάση δεδομένων
+        String sql = "SELECT * FROM Patient WHERE AMKA = ?";
 
         try (Connection con = db.getConnection();
-            PreparedStatement pstmt = con.prepareStatement(sql)) {
+                PreparedStatement stmt = con.prepareStatement(sql)) { // Χρήση PreparedStatement για ασφαλή ερωτήματα
 
-            pstmt.execute();
-
-            con.close();
+            stmt.setString(1, amkaString); // Ορισμός παραμέτρου ΑΜΚΑ
+            try (ResultSet rs = stmt.executeQuery()) { // Εκτέλεση του ερωτήματος και λήψη αποτελεσμάτων
+                if (rs.next()) {
+                    // Δημιουργία αντικειμένου Patient από τα αποτελέσματα
+                    patient = new Patient(
+                            rs.getString("nameP"),
+                            rs.getString("surname"),
+                            rs.getString("dateΟfΒirth"),
+                            rs.getString("addressP"),
+                            rs.getString("phoneNumber"),
+                            rs.getString("email"),
+                            rs.getInt("AMKA"),
+                            rs.getString("gender"));
+                }
+            }
         } catch (SQLException ex) {
+            // Αντιμετώπιση εξαίρεσης
+            ex.printStackTrace();
+            throw new Exception("Σφάλμα κατά την αναζήτηση ασθενούς με ΑΜΚΑ.", ex);
         }
+        return patient; // Επιστροφή του αντικειμένου Patient ή null αν δεν βρέθηκε
     }
 
     public List<Doctor> createDocList() throws Exception {

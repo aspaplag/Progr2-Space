@@ -1,30 +1,40 @@
-package space;
-
-import java.time.LocalDateTime;
+import java.sql.Date;
+import java.sql.Time;
 
 public class Appointment {
+    private String docCode;
     private String specialization;
-    private LocalDateTime dateTime;
+    private Time apptTime;
+    private Date apptDate;
     private Patient patient;
     private Doctor doctor;
     private int priority; // Προτεραιότητα
     private int duration; // Διάρκεια σε λεπτά
 
-    public Appointment(String specialization, LocalDateTime dateTime, Patient patient, Doctor doctor, int priority,
+    public Appointment(String docCode, String specialization, Time apptTime, Date apptDate, Patient patient, Doctor doctor, int priority,
             int duration) {
-        if (specialization == null || dateTime == null || patient == null || doctor == null) {
+        if (specialization == null || apptTime == null || apptDate == null || patient == null || doctor == null) {
             throw new IllegalArgumentException("Appointment fields cannot be null");
         }
+        this.docCode = docCode;
         this.specialization = specialization;
-        this.dateTime = dateTime;
+        this.apptTime = apptTime;
         this.patient = patient;
         this.doctor = doctor;
         this.priority = priority;
         this.duration = duration;
     }
 
-    public LocalDateTime getDateTime() {
-        return dateTime;
+    public String getDocCode() {
+        return docCode;
+    }
+
+    public Time getApptTime() {
+        return apptTime;
+    }
+
+    public Date getApptDate() {
+        return apptDate;
     }
 
     public int getPriority() {
@@ -47,7 +57,8 @@ public class Appointment {
     @Override
     public String toString() {
         return "Appointment[" + "specialization='" + specialization + '\'' +
-                ", dateTime=" + dateTime +
+                ", Time=" + apptTime +
+                ", Date=" + apptDate +
                 ", patient=" + patient.getName() +
                 ", doctor=" + doctor.getFullname() +
                 ", priority=" + priority +

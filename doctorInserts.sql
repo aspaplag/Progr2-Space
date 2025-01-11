@@ -1,0 +1,10 @@
+INSERT INTO Doctor (docCode, nameD, surname, specialization, availableTime) VALUES (1, 'Γιάννης', 'Παπαδόπουλος', 'Παθολόγος', '09:00-17:00');
+INSERT INTO Doctor (docCode, nameD, surname, specialization, availableTime) VALUES (2, 'Μαρία', 'Ιωάννου', 'Καρδιολόγος', '10:00-18:00');
+INSERT INTO Doctor (docCode, nameD, surname, specialization, availableTime) VALUES (3, 'Κώστας', 'Νικολάου', 'Γυναικολόγος', '08:00-16:00');
+INSERT INTO Doctor (docCode, nameD, surname, specialization, availableTime) VALUES (4, 'Σοφία', 'Σταυρίδης', 'Ορθοπαιδικός', '09:00-17:00');
+INSERT INTO Doctor (docCode, nameD, surname, specialization, availableTime) VALUES (5, 'Πέτρος', 'Χατζηπέτρου', 'Δερματολόγος', '10:00-18:00');
+INSERT INTO Doctor (docCode, nameD, surname, specialization, availableTime) VALUES (6, 'Ελένη', 'Δημητρίου', 'Παιδίατρος', '08:00-16:00');
+INSERT INTO Doctor (docCode, nameD, surname, specialization, availableTime) VALUES (7, 'Ανδρέας', 'Αλεξίου', 'Νευρολόγος', '11:00-19:00');
+INSERT INTO Doctor (docCode, nameD, surname, specialization, availableTime) VALUES (8, 'Νίκη', 'Μαυρίδη', 'Ενδοκρινολόγος', '09:00-17:00');
+INSERT INTO Doctor (docCode, nameD, surname, specialization, availableTime) VALUES (9, 'Θανάσης', 'Καραγιάννης', 'Ψυχίατρος', '10:00-18:00');
+INSERT INTO Doctor (docCode, nameD, surname, specialization, availableTime) VALUES (10, 'Ιωάννα', 'Αντωνίου', 'Οφθαλμίατρος', '08:00-16:00');

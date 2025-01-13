@@ -116,62 +116,37 @@ public class SqlConnect {
         return patient; // Επιστροφή του αντικειμένου Patient ή null αν δεν βρέθηκε
     }
 
-    public List<Doctor> createDocList() throws Exception {
-
-        DB db = new DB();
-        List<Doctor> doctors = new ArrayList<>();
-        String sql = "SELECT * FROM Doctor";
-
-        try (Connection con = db.getConnection();
-            PreparedStatement pstmt = con.prepareStatement(sql);
-            ResultSet resultSet = pstmt.executeQuery(sql)) {
-
-            while (resultSet.next()) {
-                String docCode = resultSet.getString("docCode");
-                String name = resultSet.getString("nameD");
-                String surname = resultSet.getString("surname");
-                String specialization = resultSet.getString("specialization");
-                List<LocalTime> availableTimeSlots = (List<LocalTime>) resultSet.getTime("availableTimeSlots");
-                int availableMinutes = resultSet.getInt("availableMinutes");
-                Doctor doctor = new Doctor(docCode, name, surname, specialization, availableTimeSlots, availableMinutes);
-                doctors.add(doctor);
-            }
-
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        return doctors;
-    }
-
-    public List<Appointment> createApptList() throws Exception {
-
+    public List<Appointment> getAppointments() throws Exception {
         DB db = new DB();
         List<Appointment> appointments = new ArrayList<>();
-        String sql = "SELECT * FROM Appointment";
-    
+        String sql = "SELECT " +
+                     "Appointment.*, " +
+                     "Doctor.docCode, Doctor.nameD AS nameD, Doctor.surname AS surnameD, Doctor.specialization, Doctor.availableTime, Doctor.availableMinutes, " +
+                     "Patient.AMKA, Patient.NameP AS nameP, Patient.Surname AS surnameP, Patient.dateOfBirth, Patient.phoneNumber, Patient.addressP AS addressP, Patient.email, Patient.medicalRecord, Patient.gender " +
+                     "FROM Appointment " +
+                     "JOIN Doctor ON Appointment.docCode = Doctor.docCode " +
+                     "JOIN Patient ON Appointment.patientAMKA = Patient.AMKA";
+        
         try (Connection con = db.getConnection();
-            Statement pstmt = con.createStatement();
-            ResultSet resultSet = pstmt.executeQuery(sql)) {
-
+             Statement pstmt = con.createStatement();
+             ResultSet resultSet = pstmt.executeQuery(sql)) {
+    
             while (resultSet.next()) {
                 String docCode = resultSet.getString("docCode");
                 String specialization = resultSet.getString("specialization");
                 Time apptTime = resultSet.getTime("apptTime");
                 Date apptDate = resultSet.getDate("apptDate");
-                
+    
                 Patient patient = createPatientFromResultSet(resultSet);
-
+                Doctor doctor = createDoctorFromResultSet(resultSet);
+    
                 int priority = resultSet.getInt("priority");
                 int duration = resultSet.getInt("duration");
     
-                // Fetch doctor details (ensure the ResultSet has necessary columns)
-                Doctor doctor = createDoctorFromResultSet(resultSet);
-    
-                // Create Appointment object
                 Appointment appointment = new Appointment(docCode, specialization, apptTime, apptDate, patient, doctor, priority, duration);
                 appointments.add(appointment);
             }
-
+    
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -181,34 +156,35 @@ public class SqlConnect {
     public Doctor createDoctorFromResultSet(ResultSet resultSet) throws SQLException {
         String docCode = resultSet.getString("docCode");
         String name = resultSet.getString("nameD");
-        String surname = resultSet.getString("surname");
+        String surname = resultSet.getString("surnameD");
         String specialization = resultSet.getString("specialization");
+    
         List<LocalTime> availableTimeSlots = new ArrayList<>();
-        String[] timeStrings = resultSet.getString("availableTime").split(",");
-        for (String timeString : timeStrings) {
-            availableTimeSlots.add(LocalTime.parse(timeString.trim()));
+        String availableTime = resultSet.getString("availableTime");
+        if (availableTime != null) {
+            String[] timeStrings = availableTime.split(",");
+            for (String timeString : timeStrings) {
+                availableTimeSlots.add(LocalTime.parse(timeString.trim()));
+            }
         }
     
         int availableMinutes = resultSet.getInt("availableMinutes");
-
+    
         return new Doctor(docCode, name, surname, specialization, availableTimeSlots, availableMinutes);
     }
 
     public Patient createPatientFromResultSet(ResultSet resultSet) throws SQLException {
-        
         String amka = resultSet.getString("AMKA");
-        String name = resultSet.getString("NameP");
-        String surname = resultSet.getString("Surname");
+        String name = resultSet.getString("nameP");
+        String surname = resultSet.getString("surnameP");
         Date dateOfBirth = resultSet.getDate("dateOfBirth");
         String phoneNumber = resultSet.getString("phoneNumber");
         String address = resultSet.getString("addressP");
         String email = resultSet.getString("email");
         String medicalRecord = resultSet.getString("medicalRecord");
         String gender = resultSet.getString("gender");
-        
-        Patient patient = new Patient(name, surname, dateOfBirth, address, phoneNumber, email, amka, medicalRecord, gender);
-        
-        return patient;
+    
+        return new Patient(name, surname, dateOfBirth, address, phoneNumber, email, amka, medicalRecord, gender);
     }
 
     public List<Doctor> getDoctorsBySpecialization(String selectedSpecialty) throws Exception {
@@ -249,7 +225,4 @@ public class SqlConnect {
         return doctors;
     }
 
-    public List<Appointment> getAppointments() throws Exception {
-        return createApptList(); // Reuse `createApptList`
-    }
 }

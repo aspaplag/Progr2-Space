@@ -1,7 +1,14 @@
-import javax.swing.*;
-import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
+import java.awt.Color;
+import java.awt.Dimension;
+import java.awt.Font;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.Insets;
+
+import javax.swing.JButton;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.SwingConstants;
 
 public class PatientInfo extends JFrame {
     private static final int WINDOW_WIDTH = 1200; 
@@ -10,11 +17,13 @@ public class PatientInfo extends JFrame {
     private JButton noButton;
     private String selectedDate;
     private String selectedTime;
+    private String selectedSpecialization;
     
-    public PatientInfo(String date, String time) {
+    public PatientInfo(String date, String time, String selectedSpecialization) {
         
         this.selectedDate = date;
         this.selectedTime = time;
+        this.selectedSpecialization = selectedSpecialization;
         
         setTitle("Στοιχεία Ασθενή");
         setSize(WINDOW_WIDTH, WINDOW_HEIGHT);
@@ -74,19 +83,19 @@ public class PatientInfo extends JFrame {
 
         yesButton.addActionListener(e -> {
             dispose();
-            new OldPatientWindow(selectedDate, selectedTime); 
+            new OldPatientWindow(selectedDate, selectedTime, selectedSpecialization); 
         });
 
         noButton.addActionListener(e -> {
             dispose(); 
-            new NewPatientWindow(selectedDate, selectedTime); 
+            new NewPatientWindow(selectedDate, selectedTime, selectedSpecialization); 
         });
    
     }
     
 
     public static void main(String[] args) {
-        new PatientInfo("__/__/___", "9:00");
+        new PatientInfo("__/__/___", "9:00","Παθολόγος");
     }
 }
 

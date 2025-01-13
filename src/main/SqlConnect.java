@@ -11,18 +11,18 @@ import java.util.List;
 
 public class SqlConnect {
 
-   public void insertPatient(int amka, String name, String surname, Date dateOfBirth, String phoneNumber,
+   public void insertPatient(String amka, String name, String surname, Date dateOfBirth, String phoneNumber,
             String address,
             String email, String medicalRecord, String gender) throws Exception {
         DB db = new DB();
-        String sql = "INSERT INTO Patient (AMKA, Name, Surname, dateOfBirth, phoneNumber, address, email, medicalRecord, gender) "
+        String sql = "INSERT INTO Patient (AMKA, NameP, Surname, dateOfBirth, phoneNumber, addressP, email, medicalRecord, gender) "
                 +
                 "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
         try (Connection con = db.getConnection();
                 PreparedStatement pstmt = con.prepareStatement(sql)) {
 
-            pstmt.setInt(1, amka);
+            pstmt.setString(1, amka);
             pstmt.setString(2, name);
             pstmt.setString(3, surname);
             pstmt.setDate(4, dateOfBirth);
@@ -44,19 +44,29 @@ public class SqlConnect {
             throw new Exception("Database error: " + ex.getMessage(), ex);
         }
     }
-    public void insertAppointment(String val1, String val2, Date val3, Time val4, String val5) throws Exception {
+    public void insertAppointment(String docCode, String specialization, Time apptTime, Date apptDate, 
+        String patientAMKA) throws Exception {
 
         DB db = new DB();
-        String sql = "INSERT INTO Appointment(docCode, specialization, apptTime, apptDate, patientName) VALUES(?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO Appointment (docCode, specialization, apptTime, apptDate, patientAMKA) "
+            +
+            "VALUES (?, ?, ?, ?, ?)";
+
         try(Connection con = db.getConnection();
             PreparedStatement pstmt = con.prepareStatement(sql)) {
 
-            pstmt.setString(1, val1);
-            pstmt.setString(2, val2);
-            pstmt.setDate(3, val3);
-            pstmt.setTime(4, val4);
-            pstmt.setString(5, val5);
-
+            pstmt.setString(1, docCode);
+            pstmt.setString(2, specialization);
+            pstmt.setTime(3, (Time) apptTime);
+            pstmt.setDate(4, (Date) apptDate);
+            pstmt.setString(5, patientAMKA);
+            
+            int rowsAffected = pstmt.executeUpdate();
+            if (rowsAffected > 0) {
+                System.out.println("Appointment successfully inserted into the database.");
+            } else {
+                System.out.println("No rows were inserted. Please check your data.");
+            }
         } catch (SQLException ex) {
         }
     }
@@ -89,11 +99,12 @@ public class SqlConnect {
                     patient = new Patient(
                             rs.getString("nameP"),
                             rs.getString("surname"),
-                            rs.getString("dateΟfΒirth"),
+                            rs.getDate("dateOfBirth"),
                             rs.getString("addressP"),
                             rs.getString("phoneNumber"),
                             rs.getString("email"),
-                            rs.getInt("AMKA"),
+                            rs.getString("AMKA"),
+                            rs.getString("medicalRecord"),
                             rs.getString("gender"));
                 }
             }
@@ -109,7 +120,7 @@ public class SqlConnect {
 
         DB db = new DB();
         List<Doctor> doctors = new ArrayList<>();
-        String sql = "SELECT * FROM doctor";
+        String sql = "SELECT * FROM Doctor";
 
         try (Connection con = db.getConnection();
             PreparedStatement pstmt = con.prepareStatement(sql);
@@ -117,7 +128,7 @@ public class SqlConnect {
 
             while (resultSet.next()) {
                 String docCode = resultSet.getString("docCode");
-                String name = resultSet.getString("name");
+                String name = resultSet.getString("nameD");
                 String surname = resultSet.getString("surname");
                 String specialization = resultSet.getString("specialization");
                 List<LocalTime> availableTimeSlots = (List<LocalTime>) resultSet.getTime("availableTimeSlots");
@@ -161,7 +172,6 @@ public class SqlConnect {
                 appointments.add(appointment);
             }
 
-            con.close();
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -169,9 +179,8 @@ public class SqlConnect {
     }
 
     public Doctor createDoctorFromResultSet(ResultSet resultSet) throws SQLException {
-        // Retrieve data from ResultSet
         String docCode = resultSet.getString("docCode");
-        String name = resultSet.getString("name");
+        String name = resultSet.getString("nameD");
         String surname = resultSet.getString("surname");
         String specialization = resultSet.getString("specialization");
         List<LocalTime> availableTimeSlots = new ArrayList<>();
@@ -181,52 +190,61 @@ public class SqlConnect {
         }
     
         int availableMinutes = resultSet.getInt("availableMinutes");
-    
-        // Create and return the Doctor object
+
         return new Doctor(docCode, name, surname, specialization, availableTimeSlots, availableMinutes);
     }
 
     public Patient createPatientFromResultSet(ResultSet resultSet) throws SQLException {
         
-        int amka = resultSet.getInt("AMKA");
-        String name = resultSet.getString("Name");
+        String amka = resultSet.getString("AMKA");
+        String name = resultSet.getString("NameP");
         String surname = resultSet.getString("Surname");
-        String dateOfBirth = resultSet.getString("dateOfBirth");
+        Date dateOfBirth = resultSet.getDate("dateOfBirth");
         String phoneNumber = resultSet.getString("phoneNumber");
-        String address = resultSet.getString("adress");
+        String address = resultSet.getString("addressP");
         String email = resultSet.getString("email");
         String medicalRecord = resultSet.getString("medicalRecord");
         String gender = resultSet.getString("gender");
         
-        Patient patient = new Patient(name, surname, dateOfBirth, address, phoneNumber, email, amka, gender);
+        Patient patient = new Patient(name, surname, dateOfBirth, address, phoneNumber, email, amka, medicalRecord, gender);
         
         return patient;
     }
 
     public List<Doctor> getDoctorsBySpecialization(String selectedSpecialty) throws Exception {
-
         DB db = new DB();
         List<Doctor> doctors = new ArrayList<>();
-        String sql = "SELECT * FROM doctor WHERE specialization = ?";
-
+        String sql = "SELECT * FROM Doctor WHERE specialization = ? COLLATE utf8mb4_general_ci";
+    
         try (Connection con = db.getConnection();
              PreparedStatement preparedStatement = con.prepareStatement(sql)) {
-
+    
             preparedStatement.setString(1, selectedSpecialty);
+    
             try (ResultSet resultSet = preparedStatement.executeQuery()) {
                 while (resultSet.next()) {
                     String docCode = resultSet.getString("docCode");
-                    String name = resultSet.getString("name");
+                    String name = resultSet.getString("nameD");
                     String surname = resultSet.getString("surname");
                     String specialization = resultSet.getString("specialization");
-                    List<LocalTime> availableTimeSlots = (List<LocalTime>) resultSet.getTime("availableTimeSlots");
+    
+                    Time availableTime = resultSet.getTime("availableTime");
+                    LocalTime localAvailableTime = availableTime != null ? availableTime.toLocalTime() : null;
+    
+                    List<LocalTime> availableTimeSlots = new ArrayList<>();
+                    if (localAvailableTime != null) {
+                        availableTimeSlots.add(localAvailableTime);
+                    }
+    
                     int availableMinutes = resultSet.getInt("availableMinutes");
+    
                     Doctor doctor = new Doctor(docCode, name, surname, specialization, availableTimeSlots, availableMinutes);
                     doctors.add(doctor);
                 }
             }
         } catch (SQLException e) {
             e.printStackTrace();
+            throw new Exception("Error fetching doctors by specialization", e);
         }
         return doctors;
     }

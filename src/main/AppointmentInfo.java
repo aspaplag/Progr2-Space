@@ -24,6 +24,7 @@ public class AppointmentInfo extends JFrame {
     private static final int WINDOW_HEIGHT = 800;
     private JComboBox<String> timeComboBox;
     private JFormattedTextField dateField;
+    private JComboBox<String> comboBox;
 
     public AppointmentInfo() {
         setTitle("Κλείστε Ραντεβού");
@@ -35,14 +36,17 @@ public class AppointmentInfo extends JFrame {
 
         setLayout(new GridBagLayout());
 
-        selectAppointment();
+        try {
+            selectAppointment();
+        } catch (Exception e) {
+        }
         selectDateAndTime();
         addButton();
 
         setVisible(true);
     }
 
-    private void selectAppointment() {
+    private void selectAppointment() throws Exception {
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.insets = new Insets(30, 60, 20, 20);
         gbc.anchor = GridBagConstraints.WEST;
@@ -56,11 +60,13 @@ public class AppointmentInfo extends JFrame {
         label.setFont(new Font("Arial", Font.PLAIN, 22));
         label.setHorizontalAlignment(SwingConstants.CENTER);
         panel.add(label, BorderLayout.NORTH);
-        // TODO getDoctorSpecialization
-        String[] options = { "Παθολόγος", "Καρδιολόγος", "Γυναικολόγος", "Ορθοπαιδικός", "Δερματολόγος",
-                "Παιδίατρος", "Νευρολόγος", "Ενδοκρινολόγος", "Ψυχίατρος", "Οφθαλμίατρος" };
+        
+        comboBox = new JComboBox<>(new String[] {
+            "Παθολόγος", "Καρδιολόγος", "Γυναικολόγος", "Ορθοπαιδικός", 
+            "Δερματολόγος", "Παιδίατρος", "Νευρολόγος", "Ενδοκρινολόγος", 
+            "Ψυχίατρος", "Οφθαλμίατρος"
+        });
 
-        JComboBox<String> comboBox = new JComboBox<>(options);
         comboBox.setFont(new Font("Arial", Font.PLAIN, 16));
         comboBox.setPreferredSize(new Dimension(420, 40));
         panel.add(comboBox, BorderLayout.CENTER);
@@ -117,10 +123,10 @@ public class AppointmentInfo extends JFrame {
         dateTimePanel.add(timeLabel, innerGbc);
 
         timeComboBox = new JComboBox<>(new String[] {
-                "09:00", "09:30", "10:00", "10:30", "11:00",
-                "11:30", "12:00", "12:30", "13:00", "13:30",
-                "14:00", "14:30", "15:00", "15:30", "16:00",
-                "16:30", "17:00"
+            "09:00", "09:30", "10:00", "10:30", "11:00",
+            "11:30", "12:00", "12:30", "13:00", "13:30",
+            "14:00", "14:30", "15:00", "15:30", "16:00",
+            "16:30", "17:00"
         });
 
         timeComboBox.setFont(new Font("Arial", Font.PLAIN, 16));
@@ -154,14 +160,13 @@ public class AppointmentInfo extends JFrame {
         submitButton.addActionListener(e -> {
             String selectedDate = dateField.getText(); // Ημερομηνία από το πεδίο
             String selectedTime = (String) timeComboBox.getSelectedItem(); // Ώρα από το comboBox
-            String selectedSpecialization = "Παθολόγος"; // Εδώ μπορείτε να πάρετε την ειδικότητα από άλλο πεδίο ή
-                                                         // dropdown.
+            String selectedSpecialization = (String) comboBox.getSelectedItem(); // Ειδικότητα γιατρού από το comboBox
 
             OptimizationAlgorithm optimizer = new OptimizationAlgorithm(new SqlConnect());
             try {
                 if (optimizer.isTimeSlotAvailable(selectedDate, selectedTime)) {
                     // Η ώρα είναι διαθέσιμη, συνεχίζουμε
-                    new PatientInfo(selectedDate, selectedTime);
+                    new PatientInfo(selectedDate, selectedTime, selectedSpecialization);
                 } else {
                     // Η ώρα δεν είναι διαθέσιμη, προτείνουμε εναλλακτικές
                     List<Doctor> doctors = new SqlConnect().getDoctorsBySpecialization(selectedSpecialization);

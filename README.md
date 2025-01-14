@@ -17,3 +17,35 @@ after downloading/cloning the repository on your computer open the command promp
    * test
      + contains all the tests for the classes mentioned above
   - misc files used for the database and readme file
+
+## UML-Mermaid Diagram
+```mermaid
+graph TD;
+Patient-->Appointment;
+Doctor-->Appointment;
+OptimizationAlgorithm-->Appointment;
+SQLdatabase<-->sqlConnect;
+sqlConnect<-->OptimizationAlgorithm;
+AppointmentInfo-->JFrame;
+AppointmentWelcomeScreen-->JFrame;
+PatientInfo-->JFrame;
+NewPatient-->JFrame;
+OldPatient-->JFrame;
+AppointmentFinalScreen-->JFrame;
+```
+## Data structures and algorithm
+- online sql database
+   * Tables:
+      + Doctor
+      + Appointment
+      + Patient
+- Optimization Algorithm
+   *receives 2 **lists** (Doctor,Appointment) from the database through the sqlConnect class and finds the closest availability
+- GUI
+  * Welcome window
+  * Patient info
+  * New patient
+  * Appointment info
+  * Appointment final screen
+  * (if patient info exists --> old patient)
+    

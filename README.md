@@ -40,7 +40,7 @@ AppointmentFinalScreen-->JFrame;
       + Appointment
       + Patient
 - Optimization Algorithm
-   *receives 2 **lists** (Doctor,Appointment) from the database through the sqlConnect class and finds the closest availability
+   * receives 2 **lists** (Doctor,Appointment) from the database through the sqlConnect class and finds the closest availability
 - GUI
   * Welcome window
   * Patient info

@@ -1,58 +1,44 @@
-import org.junit.jupiteer.api.BeforeEach;
-import org.junit.jupiter.api.Test;
+import static org.junit.Assert.*;
+import org.junit.Test;
+import java.sql.Date;
 
-import static org.juniter.api.Assertions.*;
-class PatientTest {
-    private Patient patient;
+public class PatientTest {
 
-    @BeforeEach
-    void setUp() {
-        patient = new Patient("Maria", "Berg", "2000-06-01", "567 Main Street", "890-0987", "mariaberg@example.com", "Female", "123456789");
+    @Test
+    public void testPatientCreation() {
+        Patient patient = new Patient("John", "Doe", Date.valueOf("1990-01-01"),
+                "123 Main St", "1234567890", "john@example.com", "12345678901",
+                "No allergies", "Male");
+
+        assertNotNull(patient);
+        assertEquals("John", patient.getName());
+        assertEquals("Doe", patient.getSurname());
+        assertEquals("123 Main St", patient.getAddress());
+        assertEquals("1234567890", patient.getPhoneNumber());
     }
 
     @Test
-    void testGetName() {
-        assertEquals("Maria", patient.getName());
-    }
+    public void testGetters() {
+        Patient patient = new Patient("Jane", "Doe", Date.valueOf("1985-06-15"),
+                "456 Elm St", "0987654321", "jane@example.com", "98765432109",
+                "Diabetic", "Female");
 
-    @Test
-    void testGetSurname() {
-        assertEquals("Berg", patient.getSurname());
-    }
-
-    @Test
-    void testGetDateOfBirth() {
-        assertEquals("2000-06-01", patient.getDateOfBirth());
-    }
-
-    @Test
-    void testGetAddress() {
-        assertEquals("567 Main Street", patient.getAddress());
-    }
-
-    @Test
-    void testGetPhoneNumber() {
-        assertEquals("890-0987", patient.getPhoneNumber());
-    }
-
-    @Test
-    void testGetEmail() {
-        assertEquals("mariaberg@example.com", patient.getEmail());
-    }
-
-    @Test
-    void testGetAmka() {
-        assertEquals("123456789", patient.getAmka());
-    }
-
-    @Test
-    void testGetGender() {
+        assertEquals("Jane", patient.getName());
+        assertEquals("Doe", patient.getSurname());
+        assertEquals(Date.valueOf("1985-06-15"), patient.getDateOfBirth());
+        assertEquals("Diabetic", patient.medicalRecord());
         assertEquals("Female", patient.getGender());
     }
 
     @Test
-    void testToString() {
-        String expected = "Patient{name='Maria', surname='Berg', dateOfBirth='2000-06-01', address='567 Main Street', phoneNumber='890-0987', email='mariaberg@example.com', amka='123456789', gender='Female'}";
+    public void testToString() {
+        Patient patient = new Patient("Alice", "Smith", Date.valueOf("1992-03-21"),
+                "789 Oak St", "1231231234", "alice@example.com", "12312312312",
+                "Asthmatic", "Female");
+
+        String expected = "Patient{name='Alice', surname='Smith', dateOfBirth='1992-03-21', address='789 Oak St', " +
+                "phoneNumber='1231231234', email='alice@example.com', amka='12312312312', gender='Female'}";
+
         assertEquals(expected, patient.toString());
     }
 }

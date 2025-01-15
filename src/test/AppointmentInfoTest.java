@@ -1,5 +1,3 @@
-package space;
-
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -39,6 +37,7 @@ public class AppointmentInfoTest {
         assertNotNull(typeLabel);
         assertEquals("Επιλέξτε τύπο ραντεβού", typeLabel.getText());
 
+        @SuppressWarnings("unchecked")
         JComboBox<String> comboBox = (JComboBox<String>) findComponentByType(window, JComboBox.class);
         assertNotNull(comboBox);
 

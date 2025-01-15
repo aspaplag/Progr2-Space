@@ -37,3 +37,4 @@ public class DoctorTest {
         doctor.setAvailableMinutes(-10);
     }
 }
+

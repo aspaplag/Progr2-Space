@@ -48,3 +48,4 @@ public class AppointmentTest {
         assertEquals(expectedString, appointment.toString());
     }
 }
+

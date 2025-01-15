@@ -1,5 +1,3 @@
-package space;
-
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -11,33 +9,33 @@ import static org.junit.Assert.*;
 
 public class PatientInfoTest {
 
-    private PatientInfo window; 
+    private PatientInfo window;
 
     @Before
     public void setUp() {
-        
-        window = new PatientInfo("31/12/2024", "9:00");
-      
+
+        window = new PatientInfo("31/12/2024", "9:00", "Παθολόγος");
+
     }
 
     @After
     public void tearDown() {
-        
+
         if (window != null) {
             window.dispose();
-          
+
         }
-      
+
     }
 
     @Test
     public void testWindowProperties() {
-        
+
         assertNotNull(window);
         assertEquals("Στοιχεία Ασθενή", window.getTitle());
         assertEquals(1200, window.getWidth());
         assertEquals(800, window.getHeight());
-      
+
     }
 
     @Test
@@ -54,7 +52,7 @@ public class PatientInfoTest {
         JButton noButton = (JButton) findComponentByName(window, "Όχι");
         assertNotNull(noButton);
         assertEquals("Όχι", noButton.getText());
-      
+
     }
 
     @Test
@@ -65,7 +63,7 @@ public class PatientInfoTest {
 
         yesButton.doClick();
         assertFalse(window.isShowing());
-      
+
     }
 
     @Test
@@ -76,12 +74,11 @@ public class PatientInfoTest {
 
         noButton.doClick();
         assertFalse(window.isShowing());
-      
+
     }
 
-
     private Component findComponentByName(Container container, String name) {
-      
+
         for (Component component : container.getComponents()) {
             if (component instanceof JLabel && ((JLabel) component).getText().equals(name)) {
                 return component;
@@ -98,5 +95,6 @@ public class PatientInfoTest {
         }
         return null;
     }
-  
+
 }
+

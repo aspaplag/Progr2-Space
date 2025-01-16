@@ -17,9 +17,9 @@ public class AppointmentFinalScreen extends JFrame {
         getContentPane().setBackground(BACKGROUND_COLOR);
 
         setLayout(new GridBagLayout());
-        gbc = new GridBagConstraints(); 
+        gbc = new GridBagConstraints();
 
-        showMessage(selectedDate, selectedTime); 
+        showMessage(selectedDate, selectedTime);
 
         setVisible(true);
     }
@@ -29,11 +29,11 @@ public class AppointmentFinalScreen extends JFrame {
         addConfirmationLabel();
         addDateLabel(date);
         addTimeLabel(time);
-        
+
     }
 
     private void addConfirmationLabel() {
-    	
+
         JLabel confirmationLabel = new JLabel("Το ραντεβού σας έχει επιβεβαιωθεί για:");
         confirmationLabel.setFont(new Font("Arial", Font.BOLD, TITLE_FONT_SIZE));
         confirmationLabel.setHorizontalAlignment(SwingConstants.CENTER);
@@ -45,11 +45,11 @@ public class AppointmentFinalScreen extends JFrame {
         gbc.anchor = GridBagConstraints.CENTER;
 
         add(confirmationLabel, gbc);
-        
+
     }
 
     private void addDateLabel(String date) {
-    	
+
         JLabel dateLabel = new JLabel("Ημερομηνία: " + date);
         dateLabel.setFont(new Font("Arial", Font.PLAIN, LABEL_FONT_SIZE));
         dateLabel.setHorizontalAlignment(SwingConstants.CENTER);
@@ -57,25 +57,18 @@ public class AppointmentFinalScreen extends JFrame {
         gbc.gridy = 1;
         gbc.insets = new Insets(10, 20, 5, 20);
         add(dateLabel, gbc);
-        
+
     }
 
     private void addTimeLabel(String time) {
-    	
+
         JLabel timeLabel = new JLabel("Ώρα: " + time);
         timeLabel.setFont(new Font("Arial", Font.PLAIN, LABEL_FONT_SIZE));
         timeLabel.setHorizontalAlignment(SwingConstants.CENTER);
 
         gbc.gridy = 2;
         add(timeLabel, gbc);
-        
+
     }
 
-    public static void main(String[] args) {
-    	
-        new AppointmentFinalScreen("__/__/___", "9:00");
-        
-    }
-    
-    
 }

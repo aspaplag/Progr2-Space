@@ -51,8 +51,7 @@ public class AppointmentInfo extends JFrame {
         gbc.insets = new Insets(30, 60, 20, 20);
         gbc.anchor = GridBagConstraints.WEST;
 
-        JPanel panel = new JPanel();
-        panel.setLayout(new BorderLayout());
+        JPanel panel = new JPanel(new BorderLayout());
         panel.setBackground(Color.WHITE);
         panel.setBorder(BorderFactory.createLineBorder(Color.GRAY, 1));
 
@@ -60,21 +59,33 @@ public class AppointmentInfo extends JFrame {
         label.setFont(new Font("Arial", Font.PLAIN, 22));
         label.setHorizontalAlignment(SwingConstants.CENTER);
         panel.add(label, BorderLayout.NORTH);
-        
-        comboBox = new JComboBox<>(new String[] {
-            "Παθολόγος", "Καρδιολόγος", "Γυναικολόγος", "Ορθοπαιδικός", 
-            "Δερματολόγος", "Παιδίατρος", "Νευρολόγος", "Ενδοκρινολόγος", 
-            "Ψυχίατρος", "Οφθαλμίατρος"
-        });
 
+        comboBox = new JComboBox<>();
         comboBox.setFont(new Font("Arial", Font.PLAIN, 16));
         comboBox.setPreferredSize(new Dimension(420, 40));
         panel.add(comboBox, BorderLayout.CENTER);
+
+        loadSpecializations();
 
         gbc.gridx = 0;
         gbc.gridy = 0;
         gbc.weightx = 1.0;
         add(panel, gbc);
+    }
+
+    private void loadSpecializations() {
+        SqlConnect sqlConnect = new SqlConnect();
+        try {
+            // Φόρτωση ειδικοτήτων από τη βάση
+            List<String> specializations = sqlConnect.getAllSpecializations();
+            for (String specialization : specializations) {
+                comboBox.addItem(specialization); // Προσθήκη ειδικότητας στο comboBox
+            }
+        } catch (Exception e) {
+            // Εμφάνιση μηνύματος σφάλματος
+            JOptionPane.showMessageDialog(this, "Error loading specializations: " + e.getMessage(),
+                    "Error", JOptionPane.ERROR_MESSAGE);
+        }
     }
 
     private void selectDateAndTime() {
@@ -123,10 +134,10 @@ public class AppointmentInfo extends JFrame {
         dateTimePanel.add(timeLabel, innerGbc);
 
         timeComboBox = new JComboBox<>(new String[] {
-            "09:00", "09:30", "10:00", "10:30", "11:00",
-            "11:30", "12:00", "12:30", "13:00", "13:30",
-            "14:00", "14:30", "15:00", "15:30", "16:00",
-            "16:30", "17:00"
+                "09:00", "09:30", "10:00", "10:30", "11:00",
+                "11:30", "12:00", "12:30", "13:00", "13:30",
+                "14:00", "14:30", "15:00", "15:30", "16:00",
+                "16:30", "17:00"
         });
 
         timeComboBox.setFont(new Font("Arial", Font.PLAIN, 16));
@@ -157,7 +168,7 @@ public class AppointmentInfo extends JFrame {
         gbc.anchor = GridBagConstraints.CENTER;
         add(submitButton, gbc);
 
-        submitButton.addActionListener(e -> {
+        submitButton.addActionListener(_ -> {
             String selectedDate = dateField.getText(); // Ημερομηνία από το πεδίο
             String selectedTime = (String) timeComboBox.getSelectedItem(); // Ώρα από το comboBox
             String selectedSpecialization = (String) comboBox.getSelectedItem(); // Ειδικότητα γιατρού από το comboBox
@@ -189,8 +200,4 @@ public class AppointmentInfo extends JFrame {
         });
     }
 
-    public static void main(String[] args) {
-        AppointmentInfo frame = new AppointmentInfo();
-        frame.setVisible(true);
-    }
 }

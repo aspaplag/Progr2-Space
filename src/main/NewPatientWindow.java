@@ -19,6 +19,7 @@ import javax.swing.JPanel;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.text.MaskFormatter;
+
 public class NewPatientWindow extends JFrame {
     private static final int WINDOW_WIDTH = 1200;
     private static final int WINDOW_HEIGHT = 800;
@@ -31,7 +32,6 @@ public class NewPatientWindow extends JFrame {
     private String selectedDate;
     private String selectedTime;
     private String selectedSpecialization;
-
 
     public NewPatientWindow(String date, String time, String selectedSpecialization) {
         this.selectedDate = date;
@@ -61,6 +61,7 @@ public class NewPatientWindow extends JFrame {
         mainPanel.add(rightPanel);
         return mainPanel;
     }
+
     private JPanel createLeftPanel(Color lightBlue) {
         JPanel leftPanel = new JPanel();
         leftPanel.setLayout(new BoxLayout(leftPanel, BoxLayout.Y_AXIS));
@@ -75,6 +76,7 @@ public class NewPatientWindow extends JFrame {
         emailField = addField(leftPanel, "Email:");
         return leftPanel;
     }
+
     private JPanel createRightPanel(Color lightBlue) {
         JPanel rightPanel = new JPanel();
         rightPanel.setLayout(new BoxLayout(rightPanel, BoxLayout.Y_AXIS));
@@ -86,6 +88,7 @@ public class NewPatientWindow extends JFrame {
         genderField = addField(rightPanel, "Φύλο:");
         return rightPanel;
     }
+
     private JPanel createBottomPanel(Color lightBlue) {
         JPanel bottomPanel = new JPanel();
         bottomPanel.setLayout(new FlowLayout(FlowLayout.CENTER));
@@ -95,9 +98,10 @@ public class NewPatientWindow extends JFrame {
         submitButton.setPreferredSize(new Dimension(200, 50));
         submitButton.setBackground(new Color(173, 216, 230));
         bottomPanel.add(submitButton);
-        submitButton.addActionListener(e -> handleSubmit());
+        submitButton.addActionListener(_ -> handleSubmit());
         return bottomPanel;
     }
+
     private void handleSubmit() {
         try {
             // Συλλογή δεδομένων
@@ -123,14 +127,15 @@ public class NewPatientWindow extends JFrame {
             Date dob = dateFormatter.parse(birthDate);
             java.sql.Date sqlDob = new java.sql.Date(dob.getTime());
 
-            Date  sTime = timeFormatter.parse(selectedTime);
-            java.sql.Time  sqlTime = new java.sql.Time(sTime.getTime());
+            Date sTime = timeFormatter.parse(selectedTime);
+            java.sql.Time sqlTime = new java.sql.Time(sTime.getTime());
 
             Date sDate = dateFormatter.parse(selectedDate);
             java.sql.Date sqlDate = new java.sql.Date(sDate.getTime());
-            
+
             // Δημιουργία αντικειμένου Patient
-            Patient patient = new Patient(name, surname, sqlDob, address, phone, email, amka, medicalHistory, gender);
+            // Patient patient = new Patient(name, surname, sqlDob, address, phone, email,
+            // amka, medicalHistory, gender);
             // Εισαγωγή στη βάση δεδομένων
             SqlConnect sConnect = new SqlConnect();
             sConnect.insertPatient(amka, name, surname, sqlDob, phone, address, email, medicalHistory, gender);
@@ -139,13 +144,14 @@ public class NewPatientWindow extends JFrame {
             dispose();
 
             List<Doctor> doctors = sConnect.getDoctorsBySpecialization(selectedSpecialization);
-            String docCode = doctors.get(0).getDocCode(); 
+            String docCode = doctors.get(0).getDocCode();
 
             try {
                 sConnect.insertAppointment(docCode, selectedSpecialization, sqlTime, sqlDate, amka);
             } catch (Exception ex) {
-                JOptionPane.showMessageDialog(this, "Σφάλμα κατά την αποθήκευση του ραντεβού: " + ex.getMessage(), "Σφάλμα",
-                    JOptionPane.ERROR_MESSAGE);
+                JOptionPane.showMessageDialog(this, "Σφάλμα κατά την αποθήκευση του ραντεβού: " + ex.getMessage(),
+                        "Σφάλμα",
+                        JOptionPane.ERROR_MESSAGE);
             }
 
             new AppointmentFinalScreen(selectedDate, selectedTime);
@@ -160,6 +166,7 @@ public class NewPatientWindow extends JFrame {
             ex.printStackTrace();
         }
     }
+
     private JTextField addField(JPanel panel, String labelText) {
         panel.add(createLabel(labelText, LABEL_FONT_SIZE));
         JTextField textField = new JTextField();
@@ -170,6 +177,7 @@ public class NewPatientWindow extends JFrame {
         panel.add(Box.createRigidArea(new Dimension(0, 30)));
         return textField;
     }
+
     private JFormattedTextField createDateField(JPanel panel, String labelText) {
         panel.add(createLabel(labelText, LABEL_FONT_SIZE));
         MaskFormatter dateFormatter = null;
@@ -187,6 +195,7 @@ public class NewPatientWindow extends JFrame {
         panel.add(Box.createRigidArea(new Dimension(0, 30)));
         return dateField;
     }
+
     private JTextArea createMedicalHistoryArea() {
         JTextArea medicalHistory = new JTextArea();
         medicalHistory.setFont(new Font("Arial", Font.PLAIN, 14));
@@ -195,12 +204,11 @@ public class NewPatientWindow extends JFrame {
         medicalHistory.setPreferredSize(new Dimension(FIELD_WIDTH, 100));
         return medicalHistory;
     }
+
     private JLabel createLabel(String text, int fontSize) {
         JLabel label = new JLabel(text);
         label.setFont(new Font("Arial", Font.PLAIN, fontSize));
         return label;
     }
-    public static void main(String[] args) {
-        new NewPatientWindow("01/01/2024", "09:00","Παθολόγος");
-    }
+
 }

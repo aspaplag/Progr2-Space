@@ -38,7 +38,8 @@ public class OptimizationAlgorithm {
      * @param doctors        Λίστα με τους διαθέσιμους γιατρούς
      * @return Λίστα με τις προτεινόμενες ώρες
      */
-    public List<String> suggestAlternativeTimes(String specialization, String date, List<Doctor> doctors) throws Exception {
+    public List<String> suggestAlternativeTimes(String specialization, String date, List<Doctor> doctors)
+            throws Exception {
         List<String> suggestedTimes = new ArrayList<>();
 
         // Ελέγξτε όλους τους γιατρούς της ειδικότητας

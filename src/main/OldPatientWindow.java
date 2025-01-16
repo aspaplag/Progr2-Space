@@ -12,6 +12,7 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JTextField;
+
 class OldPatientWindow extends JFrame {
     private static final int WINDOW_WIDTH = 1200;
     private static final int WINDOW_HEIGHT = 800;
@@ -22,6 +23,7 @@ class OldPatientWindow extends JFrame {
     private String selectedTime;
     private String selectedSpecialization;
     private JTextField amkaField; // Δηλώνουμε την amkaField ως πεδίο της κλάσης
+
     public OldPatientWindow(String date, String time, String selectedSpecialization) {
         this.selectedDate = date;
         this.selectedTime = time;
@@ -40,6 +42,7 @@ class OldPatientWindow extends JFrame {
         createSubmitButton(gbc);
         setVisible(true);
     }
+
     private void createAmkaLabel(GridBagConstraints gbc) {
         JLabel amkaLabel = new JLabel("Παρακαλώ εισάγετε το ΑΜΚΑ σας:");
         amkaLabel.setFont(new Font("Arial", Font.BOLD, 24));
@@ -48,6 +51,7 @@ class OldPatientWindow extends JFrame {
         gbc.gridy = 0;
         add(amkaLabel, gbc);
     }
+
     private void createAmkaField(GridBagConstraints gbc) {
         amkaField = new JTextField(20);
         amkaField.setFont(new Font("Arial", Font.PLAIN, 20));
@@ -55,6 +59,7 @@ class OldPatientWindow extends JFrame {
         gbc.gridy = 1;
         add(amkaField, gbc);
     }
+
     private void createSubmitButton(GridBagConstraints gbc) {
         JButton submitButton = new JButton("Υποβολή");
         submitButton.setFont(new Font("Arial", Font.BOLD, 16));
@@ -62,7 +67,7 @@ class OldPatientWindow extends JFrame {
         gbc.gridx = 0;
         gbc.gridy = 2;
         add(submitButton, gbc);
-        submitButton.addActionListener(e -> {
+        submitButton.addActionListener(_ -> {
             String amka = amkaField.getText().trim();
             if (amka.isEmpty()) {
                 JOptionPane.showMessageDialog(this, "Παρακαλώ εισάγετε ένα έγκυρο ΑΜΚΑ.", "Σφάλμα",
@@ -79,21 +84,22 @@ class OldPatientWindow extends JFrame {
                             JOptionPane.INFORMATION_MESSAGE);
                     SimpleDateFormat dateFormatter = new SimpleDateFormat("dd/MM/yyyy");
                     SimpleDateFormat timeFormatter = new SimpleDateFormat("HH:mm");
-    
-                    Date  sTime = timeFormatter.parse(selectedTime);
-                    java.sql.Time  sqlTime = new java.sql.Time(sTime.getTime());
-    
+
+                    Date sTime = timeFormatter.parse(selectedTime);
+                    java.sql.Time sqlTime = new java.sql.Time(sTime.getTime());
+
                     Date sDate = dateFormatter.parse(selectedDate);
                     java.sql.Date sqlDate = new java.sql.Date(sDate.getTime());
-                    
+
                     List<Doctor> doctors = sConnect.getDoctorsBySpecialization(selectedSpecialization);
-                    String docCode = doctors.get(0).getDocCode(); 
-    
+                    String docCode = doctors.get(0).getDocCode();
+
                     try {
                         sConnect.insertAppointment(docCode, selectedSpecialization, sqlTime, sqlDate, amka);
                     } catch (Exception ex) {
-                        JOptionPane.showMessageDialog(this, "Σφάλμα κατά την αποθήκευση του ραντεβού: " + ex.getMessage(), "Σφάλμα",
-                            JOptionPane.ERROR_MESSAGE);
+                        JOptionPane.showMessageDialog(this,
+                                "Σφάλμα κατά την αποθήκευση του ραντεβού: " + ex.getMessage(), "Σφάλμα",
+                                JOptionPane.ERROR_MESSAGE);
                     }
                     dispose();
                     new AppointmentFinalScreen(selectedDate, selectedTime);
@@ -105,7 +111,5 @@ class OldPatientWindow extends JFrame {
             }
         });
     }
-    public static void main(String[] args) {
-        new OldPatientWindow("__/__/___", "9:00","Παθολόγος");
-    }
+
 }
